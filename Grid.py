@@ -1,16 +1,12 @@
 from Square import Square
 
 class Grid:
-    environment = []
 
     def __init__(self):
-        for i in range(101):
-            self.environment.append([])
-            for j in range(101):
-                self.environment[i].append(Square(0))
+        self.environment = [[None] * 101 for _ in range(101)]
 
     def print_grid(self):
         for i in range(101):
             for j in range(101):
-                print(self.environment[i][j].value)
+                print(self.environment[i][j])
             print("")

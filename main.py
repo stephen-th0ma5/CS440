@@ -6,20 +6,20 @@ import random
 
 def generate_maze():
     grid = Grid()
-
+    #grid.print_grid()
     #initialize neighbors of each cell
-    for i in range(101):
-        for j in range(101):
+    for i in range(3):
+        for j in range(3):
             if i==0:
-                print("inserting at i = " + str(i) + " j = " + str(j))
                 tuple = ("South", "mommy")
-                grid.environment[i][j].children.append(1)
-                #grid.environment[i][j].children.append(tuple)
+                square = Square(0)
+                square.children.append(1)
+                grid.environment[i][j] = square
                 #if j > 0 and j < 100:
                     #e_neighbor = ("East", grid.environment[i][j+1])
                     #w_neighbor = ("West", grid.environment[i][j-1])
-            '''
-            elif j==0:
+
+            '''elif j==0:
                 tuple = ("East",grid.environment[i][j+1])
                 grid.environment[i][j].children.append(tuple)
                 if i > 0 and i < 100:
@@ -45,16 +45,17 @@ def generate_maze():
                 grid.environment[i][j].children.append(n_neighbor)
                 grid.environment[i][j].children.append(s_neighbor)
                 grid.environment[i][j].children.append(e_neighbor)
-                grid.environment[i][j].children.append(w_neighbor)
+                grid.environment[i][j].children.append(w_neighbor)'''
 
-            '''
+    print(grid.environment[0][0].children)
+    '''
 
     visited_cells = 0
     print(grid.environment[0][0].children)
 
     x = generate_x()
     y = generate_y()
-    grid.environment[x][y].visited = True
+    #grid.environment[x][y].visited = True
 
 
     #iterate from start cell
@@ -66,7 +67,7 @@ def generate_maze():
             grid.environment[x][y].visited = True
         else:
             #unblocked
-            grid.environment[x][y].visited = True
+            grid.environment[x][y].visited = True'''
 
 def generate_x():
     x = random.randint(0,101)
