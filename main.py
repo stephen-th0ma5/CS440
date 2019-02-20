@@ -7,7 +7,7 @@ import random
 def generate_maze():
     grid = Grid()
     grid = grid_init(grid);
-  
+
     #initialize neighbors of each cell
     for i in range(101):
         for j in range(101):
@@ -67,26 +67,33 @@ def generate_maze():
                 grid.environment[i][j].children.append(e_neighbor)
                 grid.environment[i][j].children.append(w_neighbor)
 
-    '''
+
+    print(len(grid.environment[0][0].children))
+    print(len(grid.environment[0][67].children))
+    print(len(grid.environment[25][25].children))
 
     visited_cells = 0
-    print(grid.environment[0][0].children)
 
-    x = generate_x()
-    y = generate_y()
-    #grid.environment[x][y].visited = True
-
-
-    #iterate from start cell
-    if grid.environment[x][y].visited == False:
-        probability = random.randint(1,11)
-        if probability <= 3:
-            #blocked
-            grid.environment[x][y].blocked = True
-            grid.environment[x][y].visited = True
+    while visited_cells < 10201:
+        x = generate_x()
+        y = generate_y()
+        if visited_cells == 0:
+            visited_cells+=1;
+            grid.environment[x][y].visited = True;
+            grid.environment[x][y].blocked = False;
         else:
-            #unblocked
-            grid.environment[x][y].visited = True'''
+            if grid.environment[x][y].visited = False:
+                grid.environment[x][y].visited = True
+                visited_cells+=1
+                probability = random.randint(1,11)
+                if probability <= 3:
+                    #blocked
+                    grid.environment[x][y].blocked = True
+
+
+        rand_int = random.randint(0,len(grid.environment[x][y].children))
+        explore = grid.environment[x][y].children[rand_int].[1]
+
 
 def generate_x():
     x = random.randint(0,101)
