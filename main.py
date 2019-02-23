@@ -7,6 +7,17 @@ import random
 from settings import *
 import time
 
+def generate_start_and_finish():
+    #choose initial cell
+    index = (generate_x() * DIM) + generate_y()
+    item = draw.c.find_withtag(str(index + 1))
+    draw.c.itemconfig(item, fill='green')
+
+    #choose target cell
+    index = (generate_x() * DIM) + generate_y()
+    item = draw.c.find_withtag(str(index + 1))
+    draw.c.itemconfig(item, fill='red')
+
 #highlights neighbors of specific cell
 def show_neighbors(i, j, grid):
     children = grid.environment[i][j].children
@@ -121,11 +132,13 @@ def generate_maze():
     initial_cell = grid.environment[x][y]
     initial_cell.visited = True;
     initial_cell.blocked = False;
+    '''
     index = (initial_cell.x * DIM) + initial_cell.y
     item = draw.c.find_withtag(str(index + 1))
     draw.c.itemconfig(item, fill='green')
-    draw.c.update()
-    time.sleep(TIME)
+    #draw.c.update()
+    #time.sleep(TIME)
+    '''
     neighbors = initial_cell.children
     num_of_neighbors = len(initial_cell.children)
     state = initial_cell
@@ -140,11 +153,13 @@ def generate_maze():
         for neighbor in neighbors:
             if(neighbor[1].visited is False):
                 node = Node(neighbor[1], None)
+                '''
                 index = (neighbor[1].x * DIM) + neighbor[1].y
                 item = draw.c.find_withtag(str(index + 1))
                 draw.c.itemconfig(item, fill='red')
                 time.sleep(TIME)
                 draw.c.update()
+                '''
                 neighbor[1].visited = True
                 stack.push(node)
 
@@ -155,11 +170,13 @@ def generate_maze():
 
         #else pop from stack
         random_cell = stack.pop().value
+        '''
         index = (random_cell.x * DIM) + random_cell.y
         item = draw.c.find_withtag(str(index + 1))
         draw.c.itemconfig(item, fill='yellow')
         time.sleep(TIME)
         draw.c.update()
+        '''
 
         #make cell unblocked or blocked with a probability
         rand = random.randint(1, 10)
@@ -169,19 +186,22 @@ def generate_maze():
             index = (random_cell.x * DIM) + random_cell.y
             item = draw.c.find_withtag(str(index + 1))
             draw.c.itemconfig(item, fill='black')
-            time.sleep(TIME)
-            draw.c.update()
+            #time.sleep(TIME)
+            #draw.c.update()
         else:
             #mark as unblocked
             random_cell.blocked = False
+            '''
             index = (random_cell.x * DIM) + random_cell.y
             item = draw.c.find_withtag(str(index + 1))
             draw.c.itemconfig(item, fill='blue')
             time.sleep(TIME)
             draw.c.update()
+            '''
 
         #move state to neighbor
         state = random_cell
+
 
 def generate_x():
     x = random.randint(0, DIM - 1)
@@ -202,5 +222,8 @@ def grid_init(grid):
 #main method
 for i in range(1):
     draw.createGrid()
-    draw.root.after(500, generate_maze)
+    generate_maze()
+    generate_start_and_finish()
     draw.drawGrid()
+    #draw.root.after(500, generate_maze)
+    #draw.drawGrid()
