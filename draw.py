@@ -4,7 +4,7 @@ from settings import *
 
 root = tk.Tk()
 height = 700
-width = 800
+width = 700
 mazeList = ["Maze 1", "Maze 2", "Maze 3", "Maze 4", "Maze 5", "Maze 6", "Maze 7", "Maze 8", "Maze 9", "Maze 10",
 "Maze 11", "Maze 12", "Maze 13", "Maze 14", "Maze 15", "Maze 16", "Maze 17", "Maze 18", "Maze 19", "Maze 20",
 "Maze 21", "Maze 22", "Maze 23", "Maze 24", "Maze 25", "Maze 26", "Maze 27", "Maze 28", "Maze 29", "Maze 30",
@@ -20,23 +20,20 @@ def drawGrid():
     root.mainloop()
 
 def createGrid():
-    dim = DIM
-    w_const = width / dim
-    h_const = height / dim
-    x1 = 0
-    y1 = 0
-    x2 = w_const
-    y2 = h_const
-    tag = 0
-    for i in range(dim):
-        for j in range(dim):
-            rect = c.create_rectangle(x1, y1, x2, y2, fill="white", outline = 'black', tags=(str(tag)))
-            tag += 1
-            x1 += w_const
-            x2 += w_const
-        y2 += h_const
-        x2 = w_const
-        x1 = 0
+    w_const = (width - 10) / DIM
+    h_const = (height - 10) / DIM
+    x1 = 5
+    y1 = 5
+    x2 = w_const + 5
+    y2 = h_const + 5
+    for i in range(DIM):
+        for j in range(DIM):
+            rect = c.create_rectangle(x1, y1, x2, y2, fill="white", outline = 'black')
+            x1 = x2
+            x2 += h_const
         y1 += h_const
+        y2 += h_const
+        x2 = w_const + 5
+        x1 = 5
     c.pack()
     root.title("Maze World")

@@ -7,7 +7,7 @@ class Frontier:
         if(self.head is None):
             self.head = node
         else:
-            node.next= self.head
+            node.next = self.head
             self.head = node
 
     def pop(self):
@@ -15,7 +15,9 @@ class Frontier:
         if(self.head is None):
             return None
         elif(self.head.next is None):
+            node = self.head
             self.head = None
-            return self.head
+            return node
+        node = self.head
         self.head = self.head.next
-        return self.head
+        return node
