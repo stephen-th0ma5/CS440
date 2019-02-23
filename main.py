@@ -9,14 +9,22 @@ import time
 
 def generate_start_and_finish():
     #choose initial cell
-    index = (generate_x() * DIM) + generate_y()
+    x1 = generate_x();
+    y1 = generate_y();
+    index = (x1 * DIM) + y1
     item = draw.c.find_withtag(str(index + 1))
     draw.c.itemconfig(item, fill='green')
+    pointA = (x1,y1)
 
     #choose target cell
-    index = (generate_x() * DIM) + generate_y()
+    x2 = generate_x();
+    y2 = generate_y();
+    index = (x2 * DIM) + y2
     item = draw.c.find_withtag(str(index + 1))
     draw.c.itemconfig(item, fill='red')
+    pointB = (x2,y2);
+
+    return [pointA, pointB];
 
 #highlights neighbors of specific cell
 def show_neighbors(i, j, grid):
@@ -219,11 +227,24 @@ def grid_init(grid):
 
         return grid
 
+def manhattan_distance(x1, y1, x2, y2):
+    return abs(x1 - x2) + abs(y1 - y2)
+
+def test_distance(start_and_end):
+    x1 = start_and_end[0][0]
+    y1 = start_and_end[0][1]
+    x2 = start_and_end[1][0]
+    y2 = start_and_end[1][1]
+
+    print("X1 = " + str(x1) + " Y1 = " + str(y1) + " X2 = " + str(x2) + " Y2 = " + str(y2))
+    print("Manhattan Distance: " + str(manhattan_distance(x1,y1,x2,y2)))
+
 #main method
 for i in range(1):
     draw.createGrid()
     generate_maze()
-    generate_start_and_finish()
+    start_and_end = generate_start_and_finish()
+    test_distance(start_and_end)
     draw.drawGrid()
     #draw.root.after(500, generate_maze)
     #draw.drawGrid()
