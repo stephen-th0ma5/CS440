@@ -1,6 +1,7 @@
 import tkinter as tk
 import random
 from settings import *
+from PIL import ImageTk, Image
 
 root = tk.Tk()
 height = 700
@@ -10,6 +11,12 @@ mazeList = ["Maze 1", "Maze 2", "Maze 3", "Maze 4", "Maze 5", "Maze 6", "Maze 7"
 "Maze 21", "Maze 22", "Maze 23", "Maze 24", "Maze 25", "Maze 26", "Maze 27", "Maze 28", "Maze 29", "Maze 30",
 "Maze 31", "Maze 32", "Maze 33", "Maze 34", "Maze 35", "Maze 36", "Maze 37", "Maze 38", "Maze 39", "Maze 40",
 "Maze 41", "Maze 42", "Maze 43", "Maze 44", "Maze 45", "Maze 46", "Maze 47", "Maze 48", "Maze 49", "Maze 50"]
+'''
+path = "./images/eyes_down.png"
+img = ImageTk.PhotoImage(Image.open(path).resize((100, 100)))
+panel = tk.Label(root, image = img)
+panel.pack(side = "bottom", fill = "both", expand = "yes")
+'''
 c = tk.Canvas(root, height=height, width=width)
 variable = tk.StringVar(root)
 variable.set("Maze 1")

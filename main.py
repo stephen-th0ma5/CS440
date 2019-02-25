@@ -219,6 +219,7 @@ def generate_maze():
         #move state to neighbor
         state = random_cell
     forward_a_star(grid, startIndex)
+    animate_solution(grid, endIndex)
 
 def generate_x():
     x = random.randint(0, DIM - 1)
@@ -241,8 +242,12 @@ def grid_init(grid, endIndex):
 def manhattan_distance(x1, y1, x2, y2):
     return abs(x1 - x2) + abs(y1 - y2)
 
+def animate_solution(grid, endIndex):
+
+
 def move_agent(closed_list):
     prev = None
+    rand_color = COLORS[random.randint(0, len(COLORS) - 1)]
     for node in closed_list:
         if(node.blocked):
             node.h_value = float("inf")
@@ -250,7 +255,7 @@ def move_agent(closed_list):
         if(node.startBlock is False):
             index = (node.x * DIM) + node.y
             item = draw.c.find_withtag(str(index + 1))
-            draw.c.itemconfig(item, fill='orange')
+            draw.c.itemconfig(item, fill=rand_color)
             time.sleep(TIME)
             draw.c.update()
         prev = node
@@ -283,41 +288,23 @@ def a_star(grid, startIndex):
         square = open_list.pop()
         #add to closed list
         closed_list.append(square)
-        '''
-        index = (square.x * DIM) + square.y
-        item = draw.c.find_withtag(str(index + 1))
-        draw.c.itemconfig(item, fill="orange")
-        time.sleep(TIME)
-        draw.c.update()
-        '''
 
         for neighbor in square.children:
             if(neighbor[1].endBlock):
                 print("found")
+                neighbor[1].parent = square
                 return closed_list
-            #set g value to current g value + 1
-            '''index = (neighbor[1].x * DIM) + neighbor[1].y
-            item = draw.c.find_withtag(str(index + 1))
-            draw.c.itemconfig(item, fill='purple')
-            time.sleep(TIME)
-            draw.c.update()'''
 
             neighbor[1].g_value = square.g_value + 1
-            neighbor[1].parent = square
             if(open_list.get(neighbor[1]) is not -1):
                 open_list.delete(neighbor[1])
             if(neighbor[1] not in closed_list):
+                neighbor[1].parent = square
                 neighbor[1].f_value = neighbor[1].g_value + neighbor[1].h_value
                 open_list.insert(neighbor[1])
 
     print("not found")
     return None
-    '''neighbor[1].g_value = square.g_value + 1
-    f_val = neighbor[1].g_value + neighbor[1].h_value
-    n_f_value = open_list.get(neighbor[1])
-    if(neighbor[1] not in closed_list or n_f_value is not -1 and f_val < n_f_value):
-    neighbor[1].f_value = f_val
-    open_list.insert(neighbor[1])'''
 
 #main method
 for i in range(1):
