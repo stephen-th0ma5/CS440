@@ -1,2 +1,2 @@
-DIM = 101
-TIME = 0
+DIM = 5
+TIME = 2

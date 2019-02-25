@@ -1,4 +1,4 @@
-import Tkinter as tk
+import tkinter as tk
 import random
 from settings import *
 

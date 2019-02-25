@@ -9,8 +9,10 @@ class Square:
         self.y = y
         self.visited = False
         self.blocked = False
+        self.startBlock = False
+        self.endBlock = False
         self.g_value = 0
         self.h_value = 0
         self.f_value = self.g_value + self.h_value
-        self.tree_pointer = None
+        self.parent = None
         self.search_value = 0

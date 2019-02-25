@@ -2,23 +2,25 @@ from Grid import Grid
 from Square import Square
 from Frontier import Frontier
 from Node import Node
+from MinHeap import MinHeap
 import draw
 import random
 from settings import *
 import time
+import math
 
 def generate_start_and_finish():
     #choose initial cell
-    x1 = generate_x();
-    y1 = generate_y();
+    x1 = generate_x()
+    y1 = generate_y()
     index = (x1 * DIM) + y1
     item = draw.c.find_withtag(str(index + 1))
     draw.c.itemconfig(item, fill='green')
     pointA = (x1,y1)
 
     #choose target cell
-    x2 = generate_x();
-    y2 = generate_y();
+    x2 = generate_x()
+    y2 = generate_y()
     index = (x2 * DIM) + y2
     item = draw.c.find_withtag(str(index + 1))
     draw.c.itemconfig(item, fill='red')
@@ -63,7 +65,13 @@ def traverse_maze():
 
 def generate_maze():
     grid = Grid()
-    grid = grid_init(grid);
+    cord_arr = generate_start_and_finish()
+    startIndex = cord_arr[0]
+    endIndex = cord_arr[1]
+    grid = grid_init(grid, endIndex);
+
+    grid.environment[startIndex[0]][startIndex[1]].startBlock = True
+    grid.environment[endIndex[0]][endIndex[1]].endBlock = True
 
     #initialize neighbors of each cell
     for i in range(DIM):
@@ -159,7 +167,7 @@ def generate_maze():
 
         #add neighbors to stack and mark as visited
         for neighbor in neighbors:
-            if(neighbor[1].visited is False):
+            if(neighbor[1].visited is False and neighbor[1].startBlock is False and neighbor[1].endBlock is False):
                 node = Node(neighbor[1], None)
                 '''
                 index = (neighbor[1].x * DIM) + neighbor[1].y
@@ -174,7 +182,7 @@ def generate_maze():
         #stack is empty return
         if(stack.size == 0):
             print("Done!")
-            return
+            break
 
         #else pop from stack
         random_cell = stack.pop().value
@@ -191,6 +199,7 @@ def generate_maze():
         if(rand < 4):
             #mark as blocked
             random_cell.blocked = True
+            #random_cell.h_value = float("inf")
             index = (random_cell.x * DIM) + random_cell.y
             item = draw.c.find_withtag(str(index + 1))
             draw.c.itemconfig(item, fill='black')
@@ -209,7 +218,7 @@ def generate_maze():
 
         #move state to neighbor
         state = random_cell
-
+    forward_a_star(grid, startIndex)
 
 def generate_x():
     x = random.randint(0, DIM - 1)
@@ -219,32 +228,94 @@ def generate_y():
     y = random.randint(0, DIM - 1)
     return y
 
-def grid_init(grid):
+def grid_init(grid, endIndex):
         for i in range(DIM):
             for j in range(DIM):
                 square = Square(0, i, j)
                 grid.environment[i][j] = square
-
+                grid.environment[i][j].g_value = 0
+                grid.environment[i][j].h_value = manhattan_distance(i, j, endIndex[0], endIndex[1])
+                grid.environment[i][j].f_value = grid.environment[i][j].g_value + grid.environment[i][j].h_value
         return grid
 
 def manhattan_distance(x1, y1, x2, y2):
     return abs(x1 - x2) + abs(y1 - y2)
 
-def test_distance(start_and_end):
-    x1 = start_and_end[0][0]
-    y1 = start_and_end[0][1]
-    x2 = start_and_end[1][0]
-    y2 = start_and_end[1][1]
+def move_agent(closed_list):
+    prev = None
+    for node in closed_list:
+        if(node.blocked):
+            node.h_value = float("inf")
+            return prev
+        index = (node.x * DIM) + node.y
+        item = draw.c.find_withtag(str(index + 1))
+        draw.c.itemconfig(item, fill='green')
+        time.sleep(TIME)
+        draw.c.update()
+        prev = node
 
-    print("X1 = " + str(x1) + " Y1 = " + str(y1) + " X2 = " + str(x2) + " Y2 = " + str(y2))
-    print("Manhattan Distance: " + str(manhattan_distance(x1,y1,x2,y2)))
+def forward_a_star(grid, startIndex):
+    closed_list = a_star(grid, startIndex)
+    while(1):
+        new_cell = move_agent(closed_list)
+        #AttributeError: 'NoneType' object has no attribute 'x' for following line
+        if(new_cell is None):
+            break
+        newIndex = (new_cell.x, new_cell.y)
+        print("start again from x:(" + str(new_cell.x) + ", " + str(new_cell.y) + ")")
+        closed_list = a_star(grid, newIndex)
+
+def a_star(grid, startIndex):
+    #initialize open and closed list
+    open_list = MinHeap()
+    closed_list = []
+    startingSquare = grid.environment[startIndex[0]][startIndex[1]]
+    open_list.insert(startingSquare)
+
+
+    while(open_list.size is not 0):
+        #pop square from open list
+        square = open_list.pop()
+        #add to closed list
+        closed_list.append(square)
+
+        index = (square.x * DIM) + square.y
+        item = draw.c.find_withtag(str(index + 1))
+        draw.c.itemconfig(item, fill='orange')
+        time.sleep(TIME)
+        draw.c.update()
+
+        for neighbor in square.children:
+            if(neighbor[1].endBlock):
+                print("found")
+                return closed_list
+            #set g value to current g value + 1
+            '''index = (neighbor[1].x * DIM) + neighbor[1].y
+            item = draw.c.find_withtag(str(index + 1))
+            draw.c.itemconfig(item, fill='purple')
+            time.sleep(TIME)
+            draw.c.update()'''
+
+            neighbor[1].g_value = square.value + 1
+            neighbor[1].parent = square
+            if(open_list.get(neighbor[1]) is not -1):
+                open_list.delete(neighbor[1])
+            neighbor[1].f_value = neighbor[1].g_value + neighbor[1].h_value
+            open_list.insert(neighbor[1])
+
+    print("not found")
+    return None
+    '''neighbor[1].g_value = square.g_value + 1
+    f_val = neighbor[1].g_value + neighbor[1].h_value
+    n_f_value = open_list.get(neighbor[1])
+    if(neighbor[1] not in closed_list or n_f_value is not -1 and f_val < n_f_value):
+    neighbor[1].f_value = f_val
+    open_list.insert(neighbor[1])'''
 
 #main method
 for i in range(1):
     draw.createGrid()
     generate_maze()
-    start_and_end = generate_start_and_finish()
-    test_distance(start_and_end)
     draw.drawGrid()
-    #draw.root.after(500, generate_maze)
+    draw.root.after(500, generate_maze)
     #draw.drawGrid()
