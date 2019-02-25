@@ -1,9 +1,11 @@
 import math
 
 class MinHeap:
-    arr = []
-    size = 0
 
+    def __init__(self):
+        self.size = 0
+        self.arr = []
+        
     def insert(self, node):
         self.size += 1
         self.arr.append(node)

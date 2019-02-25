@@ -231,7 +231,7 @@ def generate_y():
 def grid_init(grid, endIndex):
         for i in range(DIM):
             for j in range(DIM):
-                square = Square(0, i, j)
+                square = Square(i, j)
                 grid.environment[i][j] = square
                 grid.environment[i][j].g_value = 0
                 grid.environment[i][j].h_value = manhattan_distance(i, j, endIndex[0], endIndex[1])
@@ -247,22 +247,28 @@ def move_agent(closed_list):
         if(node.blocked):
             node.h_value = float("inf")
             return prev
-        index = (node.x * DIM) + node.y
-        item = draw.c.find_withtag(str(index + 1))
-        draw.c.itemconfig(item, fill='green')
-        time.sleep(TIME)
-        draw.c.update()
+        if(node.startBlock is False):
+            index = (node.x * DIM) + node.y
+            item = draw.c.find_withtag(str(index + 1))
+            draw.c.itemconfig(item, fill='orange')
+            time.sleep(TIME)
+            draw.c.update()
         prev = node
+
+def reset_g_values(grid):
+    for i in range(DIM):
+        for j in range(DIM):
+            grid.environment[i][j].g_value = 0
 
 def forward_a_star(grid, startIndex):
     closed_list = a_star(grid, startIndex)
     while(1):
         new_cell = move_agent(closed_list)
-        #AttributeError: 'NoneType' object has no attribute 'x' for following line
         if(new_cell is None):
+            print("success")
             break
         newIndex = (new_cell.x, new_cell.y)
-        print("start again from x:(" + str(new_cell.x) + ", " + str(new_cell.y) + ")")
+        reset_g_values(grid)
         closed_list = a_star(grid, newIndex)
 
 def a_star(grid, startIndex):
@@ -272,18 +278,18 @@ def a_star(grid, startIndex):
     startingSquare = grid.environment[startIndex[0]][startIndex[1]]
     open_list.insert(startingSquare)
 
-
     while(open_list.size is not 0):
         #pop square from open list
         square = open_list.pop()
         #add to closed list
         closed_list.append(square)
-
+        '''
         index = (square.x * DIM) + square.y
         item = draw.c.find_withtag(str(index + 1))
-        draw.c.itemconfig(item, fill='orange')
+        draw.c.itemconfig(item, fill="orange")
         time.sleep(TIME)
         draw.c.update()
+        '''
 
         for neighbor in square.children:
             if(neighbor[1].endBlock):
@@ -296,12 +302,13 @@ def a_star(grid, startIndex):
             time.sleep(TIME)
             draw.c.update()'''
 
-            neighbor[1].g_value = square.value + 1
+            neighbor[1].g_value = square.g_value + 1
             neighbor[1].parent = square
             if(open_list.get(neighbor[1]) is not -1):
                 open_list.delete(neighbor[1])
-            neighbor[1].f_value = neighbor[1].g_value + neighbor[1].h_value
-            open_list.insert(neighbor[1])
+            if(neighbor[1] not in closed_list):
+                neighbor[1].f_value = neighbor[1].g_value + neighbor[1].h_value
+                open_list.insert(neighbor[1])
 
     print("not found")
     return None
