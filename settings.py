@@ -1,4 +1,4 @@
-DIM = 10
-TIME = 1
+DIM = 101
+TIME = 0
 
-COLORS = ['orange', 'yellow', 'blue', 'purple', 'pink']
+COLORS = ['orange', 'yellow', 'blue', 'purple', 'pink', 'brown']

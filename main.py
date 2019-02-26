@@ -218,8 +218,28 @@ def generate_maze():
 
         #move state to neighbor
         state = random_cell
+
+
     forward_a_star(grid, startIndex)
+    time.sleep(2)
+    reset_values(grid, startIndex)
+    backward_a_star(grid, endIndex)
+    reset_values(grid, startIndex)
+    #adaptive_a_star(grid, startIndex)
     animate_solution(grid, endIndex)
+
+def reset_values(grid, startIndex):
+    for i in range(DIM):
+        for j in range(DIM):
+            if(grid.environment[i][j].blocked is False and grid.environment[i][j].startBlock is False and grid.environment[i][j].endBlock is False):
+                index = (grid.environment[i][j].x * DIM) + grid.environment[i][j].y
+                item = draw.c.find_withtag(str(index + 1))
+                draw.c.itemconfig(item, fill="white")
+            grid.environment[i][j].g_value = 0
+            grid.environment[i][j].h_value = manhattan_distance(i, j, startIndex[0], startIndex[1])
+            grid.environment[i][j].f_value = grid.environment[i][j].g_value + grid.environment[i][j].h_value
+    draw.c.update()
+    return grid
 
 def generate_x():
     x = random.randint(0, DIM - 1)
@@ -243,38 +263,171 @@ def manhattan_distance(x1, y1, x2, y2):
     return abs(x1 - x2) + abs(y1 - y2)
 
 def animate_solution(grid, endIndex):
+    print("animating")
+    ptr = grid.environment[endIndex[0]][endIndex[1]]
+    counter = 0
+    #while(ptr.parent is not None):
+        #print("the parent of (" + str(ptr.x) + ", " + str(ptr.y) + ") is (" + str(ptr.parent.x) + ", " + str(ptr.parent.y) + ")")
+        #ptr = ptr.parent
+        #counter += 1
+        #if(counter > DIM):
+            #break
 
-
-def move_agent(closed_list):
+def move_agent(closed_list, forwards):
     prev = None
     rand_color = COLORS[random.randint(0, len(COLORS) - 1)]
     for node in closed_list:
         if(node.blocked):
             node.h_value = float("inf")
             return prev
-        if(node.startBlock is False):
-            index = (node.x * DIM) + node.y
-            item = draw.c.find_withtag(str(index + 1))
-            draw.c.itemconfig(item, fill=rand_color)
-            time.sleep(TIME)
-            draw.c.update()
+        if(forwards):
+            if(node.startBlock is False):
+                index = (node.x * DIM) + node.y
+                item = draw.c.find_withtag(str(index + 1))
+                draw.c.itemconfig(item, fill=rand_color)
+                time.sleep(TIME)
+                draw.c.update()
+        else:
+            if(node.endBlock is False):
+                index = (node.x * DIM) + node.y
+                item = draw.c.find_withtag(str(index + 1))
+                draw.c.itemconfig(item, fill=rand_color)
+                time.sleep(TIME)
+                draw.c.update()
         prev = node
 
 def reset_g_values(grid):
     for i in range(DIM):
         for j in range(DIM):
             grid.environment[i][j].g_value = 0
+            grid.environment[i][j].f_value = grid.environment[i][j].h_value
+
+def backward_a_star(grid, endIndex):
+    print("--------------------")
+    print("Backward A* Algorithm")
+    start = time.time()
+    closed_list = bw_a_star(grid, endIndex)
+    counter = 1
+    while(1):
+        new_cell = move_agent(closed_list, False)
+        if(new_cell is None):
+            #print("success")
+            break
+        newIndex = (new_cell.x, new_cell.y)
+        reset_g_values(grid)
+        closed_list = bw_a_star(grid, newIndex)
+        if(closed_list is None):
+            print("Could not find target cell")
+            break;
+        counter += 1
+    end = time.time()
+    print("Cells Expanded: " + str(counter))
+    print("Time Elasped: " + str(end - start))
+    print("--------------------")
 
 def forward_a_star(grid, startIndex):
+    print("--------------------")
+    print("Forward A* Algorithm")
+    start = time.time()
     closed_list = a_star(grid, startIndex)
+    counter = 1
     while(1):
-        new_cell = move_agent(closed_list)
+        new_cell = move_agent(closed_list, True)
         if(new_cell is None):
-            print("success")
+            #print("success")
             break
         newIndex = (new_cell.x, new_cell.y)
         reset_g_values(grid)
         closed_list = a_star(grid, newIndex)
+        if(closed_list is None):
+            print("Could not find target cell")
+            break;
+        counter += 1
+    end = time.time()
+    print("Cells Expanded: " + str(counter))
+    print("Time Elasped: " + str(end - start))
+    print("--------------------")
+
+def adaptive_a_star(grid, startIndex):
+    print("--------------------")
+    print("Adaptive A* Algorithm")
+    start = time.time()
+    closed_list = ad_a_star(grid, startIndex)
+    counter = 1
+    while(1):
+        new_cell = move_agent(closed_list, True)
+        if(new_cell is None):
+            #print("success")
+            break
+        newIndex = (new_cell.x, new_cell.y)
+        reset_g_values(grid)
+        closed_list = ad_a_star(grid, newIndex)
+        if(closed_list is None):
+            print("Could not find target cell")
+            break;
+        counter += 1
+    end = time.time()
+    print("Cells Expanded: " + str(counter))
+    print("Time Elasped: " + str(end - start))
+    print("--------------------")
+
+def ad_a_star(grid, startIndex):
+    #initialize open and closed list
+    open_list = MinHeap()
+    closed_list = []
+    startingSquare = grid.environment[startIndex[0]][startIndex[1]]
+    open_list.insert(startingSquare)
+
+    while(open_list.size is not 0):
+        #pop square from open list
+        square = open_list.pop()
+        #add to closed list
+        closed_list.append(square)
+
+        for neighbor in square.children:
+
+            if(neighbor[1].endBlock):
+                #print("found")
+                return closed_list
+
+            neighbor[1].g_value = square.g_value + 1
+            neighbor[1].h_value *= 2
+            neighbor[1].parent = square
+            if(open_list.get(neighbor[1]) is not -1):
+                open_list.delete(neighbor[1])
+            if(neighbor[1] not in closed_list):
+                neighbor[1].f_value = neighbor[1].g_value + neighbor[1].h_value
+                open_list.insert(neighbor[1])
+
+    return None
+
+def bw_a_star(grid, endIndex):
+    #initialize open and closed list
+    open_list = MinHeap()
+    closed_list = []
+    startingSquare = grid.environment[endIndex[0]][endIndex[1]]
+    open_list.insert(startingSquare)
+
+    while(open_list.size is not 0):
+        #pop square from open list
+        square = open_list.pop()
+        #add to closed list
+        closed_list.append(square)
+
+        for neighbor in square.children:
+            neighbor[1].parent = square
+            if(neighbor[1].startBlock):
+                #print("found")
+                return closed_list
+
+            neighbor[1].g_value = square.g_value + 1
+            if(open_list.get(neighbor[1]) is not -1):
+                open_list.delete(neighbor[1])
+            if(neighbor[1] not in closed_list):
+                neighbor[1].f_value = neighbor[1].g_value + neighbor[1].h_value
+                open_list.insert(neighbor[1])
+
+    return None
 
 def a_star(grid, startIndex):
     #initialize open and closed list
@@ -290,21 +443,21 @@ def a_star(grid, startIndex):
         closed_list.append(square)
 
         for neighbor in square.children:
+            #print("setting the parent of (" + str(neighbor[1].x) + ", " + str(neighbor[1].y) + ") is (" + str(square.x) + ", " + str(square.y) + ")")
             if(neighbor[1].endBlock):
-                print("found")
-                neighbor[1].parent = square
+                #print("found")
                 return closed_list
 
             neighbor[1].g_value = square.g_value + 1
+            neighbor[1].parent = square
             if(open_list.get(neighbor[1]) is not -1):
                 open_list.delete(neighbor[1])
             if(neighbor[1] not in closed_list):
-                neighbor[1].parent = square
                 neighbor[1].f_value = neighbor[1].g_value + neighbor[1].h_value
                 open_list.insert(neighbor[1])
 
-    print("not found")
     return None
+
 
 #main method
 for i in range(1):

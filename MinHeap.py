@@ -5,7 +5,7 @@ class MinHeap:
     def __init__(self):
         self.size = 0
         self.arr = []
-        
+
     def insert(self, node):
         self.size += 1
         self.arr.append(node)
@@ -77,11 +77,22 @@ class MinHeap:
             self.arr[left_child] = temp
             return
         while(parent < self.size and (self.arr[parent].f_value > self.arr[left_child].f_value or self.arr[parent].f_value > self.arr[right_child].f_value)):
-            if(self.arr[left_child].f_value <= self.arr[right_child].f_value):
+            if(self.arr[left_child].f_value < self.arr[right_child].f_value):
                 temp = self.arr[parent]
                 self.arr[parent] = self.arr[left_child]
                 self.arr[left_child] = temp
                 parent = left_child
+            elif(self.arr[left_child].f_value == self.arr[right_child].f_value):
+                if(self.arr[left_child].g_value < self.arr[right_child].g_value):
+                    temp = self.arr[parent]
+                    self.arr[parent] = self.arr[left_child]
+                    self.arr[left_child] = temp
+                    parent = left_child
+                else:
+                    temp = self.arr[parent]
+                    self.arr[parent] = self.arr[right_child]
+                    self.arr[right_child] = temp
+                    parent = right_child
             else:
                 temp = self.arr[parent]
                 self.arr[parent] = self.arr[right_child]
